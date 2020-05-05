@@ -1,0 +1,82 @@
+.kefel-board {
+    display: flex;
+    flex-flow: column;
+
+    &_title {
+        width: 100%;
+        margin-bottom: 20px;
+        font-size: 20pt;
+    }
+
+    &_complete {
+        font-size: 40pt;
+        color: green;
+        padding: 10px;
+    }
+
+    &_equation {
+        font-size: 32pt;
+        color: blue;
+        margin-bottom: 20px;
+        min-height: 60px;
+    }
+
+  &_select-number {
+      font-size: 18pt;
+
+      select {
+          margin: 5px;
+          width: 100px;
+          font-size: 18pt;
+      }
+  }
+
+  &_board {
+      display: flex;
+      flex-flow: column;
+        &_row {
+            display: flex;
+            flex-flow: row;
+            border-bottom: 1px solid #a7a7a7;
+
+            &_value,&_header {
+                border-right: 1px solid #a7a7a7;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100px;
+                width: 100px;
+            }
+
+            &_header {
+                color: darkgreen;
+                font-weight: 500;
+
+                &--selected {
+                    background-color: lightcyan;
+                }
+            }
+
+            &_value {
+                input {
+                    width: 95%;
+                    height: 95%;
+                    border: none;
+                    font-size: 22pt;
+                    font-weight: 500;
+                    text-align: center;
+                }
+                &--correct {
+                    input {
+                        background-color: lightgreen;
+                    }
+                }
+                &--wrong {
+                    input {
+                        background-color: lightpink;
+                    }
+                }
+            }
+        }
+    }
+}
