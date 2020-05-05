@@ -12,10 +12,9 @@ export default class App extends React.Component<{}, AppState> {
     maxNumber: 3
   }
 
-
   renderBoard = () => {
     const { maxNumber } = this.state
-    return  <KefelBoard maxNumber={maxNumber} operation={BoardOperation.ADD}></KefelBoard>
+    return  <KefelBoard maxNumber={maxNumber} operation={BoardOperation.MULTIPLY}></KefelBoard>
   }
 
   render() {

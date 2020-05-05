@@ -2,10 +2,19 @@ import React, { SyntheticEvent } from "react";
 import classnames from "classnames";
 import "./KefelBoard.scss";
 import { KefelBoardCell, initBoard, KefelBoardConfig, BoardOperation, BoardOperationTypes } from "./KefelBoardUtils";
-import { isEqual } from "lodash";
+import { isEqual, random } from "lodash";
 
 type AnswerMap = Map<string, number | undefined>
 const emptyMap = (): AnswerMap => new Map<string, number|undefined>()
+
+const IMAGES = [
+  '/assets/images/puppy1.jpg',
+  '/assets/images/puppy2.jpg',
+  '/assets/images/puppy3.jpg',
+  '/assets/images/kitten1.jpg',
+  '/assets/images/kitten2.jpg',
+  '/assets/images/kitten3.jpg',
+]
 
 interface KefelBoardProps {
   maxNumber: number;
@@ -179,6 +188,11 @@ export default class KefelBoard extends React.Component<
     this.setState({ answers: answers || emptyMap(), typedAnswer, isComplete: isComplete || false });
   }
 
+  getRandomImage = () => {
+    const randomIndex = random(0, IMAGES.length - 1)
+    return IMAGES[randomIndex]
+  }
+
   render() {
     const { maxNumber, operation } = this.state;
     const { selectedRow, selectedCol, typedAnswer, isComplete } = this.state;
@@ -189,7 +203,7 @@ export default class KefelBoard extends React.Component<
           <div className="kefel-board_complete" dir="rtl">
             כל הכבוד!!!
             <br />
-            <img src="assets/images/puppy.jpg" alt="" />
+            <img src={this.getRandomImage()} alt="" />
           </div>
         )}
         <div className="kefel-board_title">{title}</div>
