@@ -7,9 +7,14 @@ export interface KefelBoardCell {
   isColumnHeader: boolean;
 }
 
+export enum Operation {
+  MULTIPLY = "×",
+  ADD = "+",
+}
+
 export interface KefelBoardConfig {
-    values: KefelBoardCell[][]
-    answers: Map<string,number|undefined>
+  values: KefelBoardCell[][];
+  answers: Map<string, number | undefined>;
 }
 
 /**
@@ -18,24 +23,31 @@ export interface KefelBoardConfig {
  */
 export function initBoard(maxNumber: number): KefelBoardConfig {
   const values = [];
-  const answers: Map<string, number|undefined> = new Map()
+  const answers: Map<string, number | undefined> = new Map();
 
   for (let i = 0; i <= maxNumber; i++) {
     const row: KefelBoardCell[] = [];
     for (let j = 0; j <= maxNumber; j++) {
-        const key = `${i}_${j}`
-        const cell: KefelBoardCell = {
-            row: i,
-            col: j,
-            key,
-            isColumnHeader: j === 0,
-            isRowHeader: i === 0,
-            value: (j === 0 && i === 0) ? '×' : (i === 0) ? j : (j === 0) ? i : i * j
-        }
-        if (i !== 0 && j !== 0) {
-            answers.set(key, i*j)
-        }
-        row.push(cell)
+      const key = `${i}_${j}`;
+      const cell: KefelBoardCell = {
+        row: i,
+        col: j,
+        key,
+        isColumnHeader: j === 0,
+        isRowHeader: i === 0,
+        value:
+          j === 0 && i === 0
+            ? Operation.MULTIPLY
+            : i === 0
+            ? j
+            : j === 0
+            ? i
+            : i * j,
+      };
+      if (i !== 0 && j !== 0) {
+        answers.set(key, i * j);
+      }
+      row.push(cell);
     }
 
     values.push(row);

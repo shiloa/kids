@@ -1,8 +1,11 @@
 import React, { SyntheticEvent } from "react";
 import classnames from "classnames";
 import "./KefelBoard.scss";
-import { KefelBoardCell, initBoard, KefelBoardConfig } from "./KefelBoardUtils";
+import { KefelBoardCell, initBoard, KefelBoardConfig, Operation } from "./KefelBoardUtils";
 import { isEqual } from "lodash";
+
+type AnswerMap = Map<string, number | undefined>
+const emptyMap = (): AnswerMap => new Map<string, number|undefined>()
 
 interface KefelBoardProps {
   maxNumber: number;
@@ -12,7 +15,7 @@ interface KefelBoardState {
   boardConfig?: KefelBoardConfig;
   selectedCol?: number;
   selectedRow?: number;
-  answers: Map<string, number | undefined>;
+  answers: AnswerMap;
   typedAnswer?: string;
   isComplete: boolean;
   maxNumber: number;
@@ -32,14 +35,14 @@ export default class KefelBoard extends React.Component<
       selectedCol: undefined,
       selectedRow: undefined,
       typedAnswer: undefined,
-      answers: new Map<string, number | undefined>(),
+      answers: emptyMap(),
       isComplete: false,
     };
   }
 
   resetState = (maxNumber: number) => {
     const boardConfig = initBoard(maxNumber);
-    const answers = new Map<string, number | undefined>();
+    const answers = emptyMap();
     this.setState({
       maxNumber,
       boardConfig,
@@ -108,6 +111,7 @@ export default class KefelBoard extends React.Component<
                   placeholder="?"
                   onFocus={this.onTextInputFocus.bind(this, col, row)}
                   onChange={this.onTextInputChange}
+                  value={currentAnswer || ""}
                 />
               </div>
             );
@@ -145,8 +149,14 @@ export default class KefelBoard extends React.Component<
     const key = `${selectedRow}_${selectedCol}`;
     answers.set(key, !!value ? parseInt(value) : undefined);
     const isComplete = isEqual(boardConfig?.answers, answers);
-    this.setState({ answers, typedAnswer: value, isComplete });
+
+    this.updateBoardState({ answers, typedAnswer: value, isComplete });
   };
+
+  updateBoardState = (newState: Partial<KefelBoardState>) => {
+    const { answers, typedAnswer, isComplete } = newState
+    this.setState({ answers: answers || emptyMap(), typedAnswer, isComplete: isComplete || false });
+  }
 
   render() {
     const { maxNumber } = this.state;
@@ -164,7 +174,7 @@ export default class KefelBoard extends React.Component<
         <div className="kefel-board_title">{title}</div>
         {selectedCol && selectedRow && (
           <div className="kefel-board_equation">
-            {selectedRow} × {selectedCol} = {typedAnswer || "?"}{" "}
+            {selectedRow} {Operation.MULTIPLY} {selectedCol} = {typedAnswer || "?"}{" "}
           </div>
         )}
         <div className="kefel-board_board">{this.renderValues()}</div>
