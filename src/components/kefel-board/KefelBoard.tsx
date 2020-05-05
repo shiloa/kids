@@ -1,7 +1,7 @@
 import React, { SyntheticEvent } from "react";
 import classnames from "classnames";
 import "./KefelBoard.scss";
-import { KefelBoardCell, initBoard, KefelBoardConfig, Operation } from "./KefelBoardUtils";
+import { KefelBoardCell, initBoard, KefelBoardConfig, BoardOperation, BoardOperationTypes } from "./KefelBoardUtils";
 import { isEqual } from "lodash";
 
 type AnswerMap = Map<string, number | undefined>
@@ -9,6 +9,7 @@ const emptyMap = (): AnswerMap => new Map<string, number|undefined>()
 
 interface KefelBoardProps {
   maxNumber: number;
+  operation: string
 }
 
 interface KefelBoardState {
@@ -19,6 +20,7 @@ interface KefelBoardState {
   typedAnswer?: string;
   isComplete: boolean;
   maxNumber: number;
+  operation: string
 }
 
 export default class KefelBoard extends React.Component<
@@ -27,10 +29,12 @@ export default class KefelBoard extends React.Component<
 > {
   constructor(props: KefelBoardProps) {
     super(props);
-    const boardConfig: KefelBoardConfig = initBoard(this.props.maxNumber);
+    const { maxNumber, operation } = this.props
+    const boardConfig: KefelBoardConfig = initBoard(maxNumber, operation);
 
     this.state = {
-      maxNumber: this.props.maxNumber,
+      maxNumber,
+      operation,
       boardConfig,
       selectedCol: undefined,
       selectedRow: undefined,
@@ -40,11 +44,13 @@ export default class KefelBoard extends React.Component<
     };
   }
 
-  resetState = (maxNumber: number) => {
-    const boardConfig = initBoard(maxNumber);
+  resetState = (newMaxNumber?: number, newOperation?: string) => {
+    const { operation, maxNumber } = this.state
+    const boardConfig = initBoard(newMaxNumber || maxNumber, newOperation || operation);
     const answers = emptyMap();
     this.setState({
-      maxNumber,
+      maxNumber: newMaxNumber || maxNumber,
+      operation: newOperation || operation,
       boardConfig,
       isComplete: false,
       selectedCol: undefined,
@@ -55,11 +61,18 @@ export default class KefelBoard extends React.Component<
 
   updateMaxNumber = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const { value } = e.currentTarget;
+    const { operation } = this.state
     const maxNumber = parseInt(value);
-    this.resetState(maxNumber)
+    this.resetState(maxNumber, operation)
   };
 
-  getSelectOptions = () => {
+  updateOperation = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { value } = e.currentTarget;
+    const { maxNumber } = this.state
+    this.resetState(maxNumber, value)
+  }
+
+  getSelectNumberOptions = () => {
     const options = [];
     for (let i = 2; i <= 10; i++) {
       options.push(
@@ -70,6 +83,14 @@ export default class KefelBoard extends React.Component<
     }
     return options;
   };
+
+  getSelectOperationOptions = () => {
+    return Object.keys(BoardOperation)
+      .map(op => {
+        const value = (BoardOperation as any)[op]
+        return <option value={value} key={op}>{value}</option>
+      })
+  }
 
   renderValues = () => {
     const { selectedCol, selectedRow, answers, boardConfig } = this.state;
@@ -159,7 +180,7 @@ export default class KefelBoard extends React.Component<
   }
 
   render() {
-    const { maxNumber } = this.state;
+    const { maxNumber, operation } = this.state;
     const { selectedRow, selectedCol, typedAnswer, isComplete } = this.state;
     const title = `לוח הכפל עד ${maxNumber}`;
     return (
@@ -174,14 +195,20 @@ export default class KefelBoard extends React.Component<
         <div className="kefel-board_title">{title}</div>
         {selectedCol && selectedRow && (
           <div className="kefel-board_equation">
-            {selectedRow} {Operation.MULTIPLY} {selectedCol} = {typedAnswer || "?"}{" "}
+            {selectedRow} {operation} {selectedCol} = {typedAnswer || "?"}{" "}
           </div>
         )}
         <div className="kefel-board_board">{this.renderValues()}</div>
         <div dir="rtl" className="kefel-board_select-number">
           בחרו מספר
           <select onChange={this.updateMaxNumber} defaultValue={maxNumber}>
-            {this.getSelectOptions()}
+            {this.getSelectNumberOptions()}
+          </select>
+        </div>
+        <div dir="rtl" className="kefel-board_select-number">
+          בחרו פעולה
+          <select onChange={this.updateOperation} defaultValue={operation}>
+            {this.getSelectOperationOptions()}
           </select>
         </div>
       </div>
