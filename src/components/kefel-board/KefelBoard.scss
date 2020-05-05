@@ -12,6 +12,10 @@
         font-size: 40pt;
         color: green;
         padding: 10px;
+
+        img {
+            max-width: 280px;
+        }
     }
 
     &_equation {
